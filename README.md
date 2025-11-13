@@ -20,10 +20,33 @@ Totods los registros que se manejan estan en formato excel
 
 Los clientes no tienen accesos a sus facturas desde hace 3 meses por lo cual tienen que trasladarse a la oficina principal de la empresa para conocer y pagar el valor de las facturas.
 
+### Modelo entidad relación
+
+![Diagrama entidad relacion](/images/er.jpg)
+
 ### Requerimientos
 
 1. Crear la base de datos
 2. Importar los datos proporcionados
+
+Implementar una API Rest que gestiones los siguientes puntos
+
 3. Implementar un sistema de roles y permisos
 4. Implementar funcionalidad crud para gestionar factura
 5. Envio de notificaciones mediante correo electronico cuando se genere una factura
+6. Desplegar la solución en docker (opcional)
+
+### Obervaciones
+
+- Manejo de colas de procesamiento
+- Aplicar principios SOLID
+
+### Instrucciones de entrega
+
+- Realiza un fork o clona el repo base de la prueba
+- Realiza una pull request al repositorio principal
+- Sustentar la solución
+
+### Notas finales
+
+Esta prueba busca evaluar habilidades técnicas clave para un desarrollador Backend Junior, creación de APIs, manipulación de datos, optimización del código y buenas prácticas. No es obligatorio completar todos los puntos, pero se valorará la calidad del código y la solución presentada.
