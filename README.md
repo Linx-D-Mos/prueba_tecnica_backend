@@ -27,14 +27,16 @@ Los clientes no tienen accesos a sus facturas desde hace 3 meses por lo cual tie
 ### Requerimientos
 
 1. Crear la base de datos
-2. Importar los datos proporcionados
+2. Importar los datos proporcionados y generar las 3 facturas de los 3 ultimos meses
 
 Implementar una API Rest que gestiones los siguientes puntos
 
 3. Implementar un sistema de roles y permisos
-4. Implementar funcionalidad crud para gestionar factura
-5. Envio de notificaciones mediante correo electronico cuando se genere una factura
-6. Desplegar la solución en docker (opcional)
+4. Implementar funcionalidad para gestionar los medidores
+5. Implementar funcionalidad para gestionar la lectura de los medidores.
+6. Implementar funcionalidad crud para gestionar las facturas
+7. Envio de notificaciones mediante correo electronico cuando se genere una factura
+8. Desplegar la solución en docker (opcional)
 
 ### Obervaciones
 
