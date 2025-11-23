@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('meters', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id')->constrained('customers');
-            $table->string('serial_numbre');
-            $table->date('instalation_date');
+            $table->string('serial_number');
+            $table->date('installation_date');
             $table->enum('status',['active','inactive'])->default('active');
             $table->timestamps();
         });
