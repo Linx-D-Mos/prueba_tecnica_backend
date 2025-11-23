@@ -8,9 +8,9 @@ return[
             'name' => 'Consumo Básico de Agua',
             'price_per_m3' => 2000.00,
         ],
-        'sewarage' => [
+        'sewerage' => [
             'name' => 'Servicio de Alcantarillado',
-            'fixed_price' => 5000,00,
+            'fixed_price' => 5000.00,
         ],
         'tax_rate' => 0.19,
     ],
