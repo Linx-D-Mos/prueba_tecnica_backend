@@ -9,6 +9,7 @@ use App\Models\Meter;
 use App\Models\MeterReading;
 use App\Enums\InvoiceStatus;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -18,27 +19,49 @@ class BillingService
      * Clase para generar facturas apartir de un cliente y una fecha de corte y-m-d
      * @param Customer $customer El cliente a facturar.
      * @param Carbon $billingDate Fecha de corte example 2024-04-15
-     * @return Invoice|null Retorna la factura o null si no hay lecturas.
+     * @return Collection<Invoice>|null Retorna las facturas que tenga ligadas un cliente o null si no hay lecturas del medidor.
      */
-    public function generateInvoiceForPeriod(Customer $customer, Carbon $billingDate): ?Invoice
+    public function generateInvoicesForCustomer(Customer $customer, Carbon $billingDate): Collection
     {
-        $meter = $customer->meters()->where('status', 'active')->first();
-        if (!$meter) {
-            Log::warning("El cliente {$customer->id} no tiene medidor activo.");
-            return null;
+        $generatedInvoices = collect(); //colección vacia
+
+        $meters = $customer->meters()->where('status', 'active')->get(); //Traemos todos los medidores de un cliente cuyos estados sean activo
+
+        if (!$meters) {
+            Log::warning("El cliente {$customer->id} no tiene medidores activos.");
+            return $generatedInvoices;
         }
-        $reading =  $this->getReadingForPeriod($meter, $billingDate);
+        foreach ($meters as $meter) {
+            $invoice = $this->generateInvoiceForMeter($meter, $customer, $billingDate);
+            if ($invoice) {
+                $generatedInvoices->push($invoice);
+            }
+        }
+        return $generatedInvoices;
+    }
+
+    private function generateInvoiceForMeter(Meter $meter, Customer $customer, Carbon $billingDate): ?Invoice
+    {
+
+        $reading = $this->getReadingForPeriod($meter, $billingDate);
+
         if (!$reading) {
             return null;
         }
-        return DB::transaction(function () use ($customer, $reading, $billingDate) {
-            $invoice = $this->createInvoiceHeader($customer, $reading, $billingDate);
-            $total = 0;
-            $total += $this->addWaterConcept($invoice, $reading);
-            $total += $this->addSewerageConcept($invoice);
-            $invoice->update(['total_amount' => $total]);
-            return $invoice;
-        });
+
+        return DB::transaction(
+            function () use ($customer, $billingDate, $reading) {
+                $invoice = $this->createInvoiceHeader($customer,$reading,$billingDate);
+
+                $total = 0;
+                $total += $this->addWaterConcept($invoice,$reading);
+                $total += $this->addSewerageConcept($invoice);
+
+                $invoice->update(['total_amount' => $total]);
+                \App\Jobs\SendInvoiceEmailJob::dispatch($invoice);
+                return $invoice;
+            }
+        );
     }
     private function getReadingForPeriod(Meter $meter, Carbon $date): ?MeterReading
     {
@@ -69,7 +92,7 @@ class BillingService
     {
         $price = config('billing.concepts.water.price_per_m3');
         $subtotal = $reading->consumption_m3 * $price;
-        $taxRate = config('billing.concepts.tax_rate',0);
+        $taxRate = config('billing.concepts.tax_rate', 0);
         $taxAmount = $taxRate * $subtotal;
         $total = $subtotal + $taxAmount;
         InvoiceDetail::create([

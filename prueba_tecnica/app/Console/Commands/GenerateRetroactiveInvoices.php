@@ -36,9 +36,9 @@ class GenerateRetroactiveInvoices extends Command
         foreach ($datesToProcess as $date) {
             foreach ($customers as $customer) {
                 try {
-                    $invoice = $billingService->generateInvoiceForPeriod($customer, $date);
-                    if ($invoice) {
-                        $generatedCount++;
+                    $invoices = $billingService->generateInvoicesForCustomer($customer, $date);
+                    if ($invoices) {
+                        $generatedCount+= $invoices->count();
                     } else {
                         $skippedCount++;
                     }

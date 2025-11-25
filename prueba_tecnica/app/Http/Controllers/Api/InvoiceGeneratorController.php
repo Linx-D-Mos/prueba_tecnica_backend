@@ -20,19 +20,19 @@ class InvoiceGeneratorController extends Controller
         $date = Carbon::parse($validated['billing_date']);
 
         try {
-            $invoice = $billingService->generateInvoiceForPeriod($customer,$date);
-            if(!$invoice){
+            $invoices = $billingService->generateInvoicesForCustomer($customer,$date);
+            if(!$invoices){
                 return response()->json([
-                    'message' => 'No se pudo generar la factura, revisa que el cliente tenga un medidor activo y lecturas registradas para esa fecha'
+                    'message' => 'No se generaron factura. Verifique que el cliente tenga un medidor activo y lecturas registradas para esa fecha'
                 ],422);
             }
             return response()->json([
-                'message' => 'Factura registrada con exito',
-                'data' => $invoice
+                'message' => "Se generaron {$invoices->count()} Facturas con exito",
+                'data' => $invoices
             ],201);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al momento de realizar la factura: ' . $e->getMessage()
+                'message' => 'Error al momento de realizar las facturas: ' . $e->getMessage()
             ],500);
         }
     }
